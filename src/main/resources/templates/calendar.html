@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Виндовский календарь</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .calendar {
+            border: 2px solid #4d90fe;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-header {
+            background-color: #4d90fe;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .calendar-body {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        table {
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #4d90fe;
+            color: white;
+        }
+
+        td {
+            cursor: pointer;
+        }
+
+        td:hover {
+            background-color: #e6f3ff;
+        }
+
+        #popup {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            border: 1px solid #888;
+            padding: 10px;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calendar">
+    <div class="calendar-header">
+        <button onclick="previousMonth()">&#8249;</button>
+        <div id="selectedDate"></div>
+        <button onclick="nextMonth()">&#8250;</button>
+    </div>
+    <div class="calendar-body">
+        <table>
+            <thead>
+            <tr>
+                <th>Пн</th>
+                <th>Вт</th>
+                <th>Ср</th>
+                <th>Чт</th>
+                <th>Пт</th>
+                <th>Сб</th>
+                <th>Вс</th>
+            </tr>
+            </thead>
+            <tbody id="calendar-body">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="popup" id="popup">Блок занять</div>
+
+<script>
+    const calendarBody = document.getElementById('calendar-body');
+     let currentDate = new Date();
+     const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+
+     function generateCalendar() {
+         calendarBody.innerHTML = '';
+
+         const startingDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+         const prevDays = startingDay === 0 ? 6 : startingDay - 1;
+         const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+
+         let day = 1;
+
+         for (let i = 0; i < 6; i++) {
+             const row = document.createElement('tr');
+
+             for (let j = 0; j < 7; j++) {
+                  const cell = document.createElement('td');
+
+                 if (i === 0 && j < prevDays) {
+                     const prevDate = lastDay - (prevDays - j - 1);
+                     cell.textContent = "";
+                 } else if (day > lastDay) {
+                    if (j === 0) {
+                    break;
+                    }
+                 } else {
+                     cell.textContent = day;
+                     day++;
+                     cell.addEventListener('mouseover', () => {
+                         document.getElementById('popup').style.display = 'block';
+                     });
+                     cell.addEventListener('mouseout', () => {
+                         document.getElementById('popup').style.display = 'none';
+                     });
+                 }
+
+                 row.appendChild(cell);
+             }
+
+             calendarBody.appendChild(row);
+         }
+
+     }
+     function showPopup(date) {
+        const popup = document.getElementById('popup');
+        const selectedDate = document.getElementById('selectedDate');
+        selectedDate.textContent = months[currentMonth] + ' ' + date + ', ' + currentYear;
+        popup.style.display = 'block';
+    }
+    function previousMonth() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        updateSelectedMonth();
+        generateCalendar();
+    }
+     function nextMonth() {
+         currentDate.setMonth(currentDate.getMonth() + 1);
+         updateSelectedMonth();
+         generateCalendar();
+     }
+
+    function updateSelectedMonth() {
+        const selectedDate = document.getElementById('selectedDate');
+        selectedDate.textContent = months[currentDate.getMonth()] + ', ' + currentDate.getFullYear();
+    }
+     generateCalendar();
+
+</script>
+
+</body>
+</html>
